@@ -1,0 +1,329 @@
+<!-- Matrox PINS Generator - Copyright (C) 2026 llamafarmer2 - GPL-3.0 (see LICENSE) -->
+<html>
+<head>
+<title>Matrox PIN Generator</title>
+<HTA:APPLICATION ID="PinGen" APPLICATIONNAME="MatroxPinGenerator" BORDER="thick"
+  CAPTION="yes" SHOWINTASKBAR="yes" SINGLEINSTANCE="no" SYSMENU="yes"
+  WINDOWSTATE="normal" SCROLL="yes" INNERBORDER="no" />
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<style type="text/css">
+body { font-family: Tahoma, Verdana, Arial, sans-serif; font-size: 9pt; margin: 0; background: #ECE9D8; color: #000; }
+#bar { background: #D4D0C8; border-bottom: 1px solid #808080; padding: 8px 10px; }
+#bar select { font-family: Tahoma, Arial; font-size: 10pt; }
+#bar b { font-size: 10pt; }
+#cardinfo { padding: 6px 10px; background: #FFFFE8; border-bottom: 1px solid #A0A0A0; }
+#main { padding: 8px 10px; }
+h3 { font-size: 10pt; margin: 12px 0 4px 0; color: #003070; }
+table.grid { border-collapse: collapse; background: #FFFFFF; width: 100%; }
+table.grid th { background: #D4D0C8; border: 1px solid #A0A0A0; padding: 3px 6px; text-align: left; }
+table.grid td { border: 1px solid #C8C8C8; padding: 3px 6px; vertical-align: top; }
+td.no { text-align: right; color: #555; width: 22px; }
+td.lbl { width: 190px; }
+td.lbl span { color: #666; font-size: 8pt; }
+input.v, select.v { font-family: "Courier New", monospace; font-size: 9pt; }
+input.v { width: 190px; }
+.fixed { font-family: "Courier New", monospace; color: #555; }
+tr.chg td { background: #FFF3C0; }
+tr.bad td { background: #FFD8D8; }
+.hint { color: #305080; font-size: 8pt; }
+.warn { color: #A05000; font-size: 8pt; }
+.err { color: #C00000; font-weight: bold; font-size: 8pt; }
+#savebox { background: #FFFFFF; border: 1px solid #A0A0A0; padding: 8px; margin-top: 12px; }
+#savebox input.path { font-family: Tahoma, Arial; font-size: 9pt; width: 280px; }
+#preview { font-family: "Courier New", monospace; font-size: 9pt; width: 100%; height: 230px; }
+#status { padding: 4px 10px; background: #D4D0C8; border-top: 1px solid #808080; }
+code { font-family: "Courier New", monospace; background: #EEE; padding: 0 3px; }
+</style>
+
+<script type="text/javascript">
+/* ---- Card database (generated from 37 real PROGBIOS dumps by build.py) ---- */
+var DB = /*DB*/;
+</script>
+
+<script type="text/javascript" id="core">
+/* ===== CORE LOGIC (no UI) - ES3 so it runs in old Windows script engines ===== */
+function trim(s) { return s.replace(/^\s+|\s+$/g, ""); }
+function isNum(s) { return /^\d+$/.test(s); }
+
+function specOf(card) { return DB.layouts[card.layout]; }
+
+/* Values a field may take for this card (non-expert mode). */
+function fieldOptions(cardIdx, i) {
+  var card = DB.cards[cardIdx], sp = specOf(card)[i], seen = {}, out = [], k, c, v;
+  if (sp[0] !== "hw") return [card.values[i]];
+  for (k = 0; k < DB.cards.length; k++) {
+    c = DB.cards[k];
+    if (c.family !== card.family || c.layout !== card.layout) continue;
+    v = c.values[i];
+    if (!seen["_" + v]) { seen["_" + v] = 1; out.push(v); }
+  }
+  out.sort(function (a, b) {
+    if (isNum(a) && isNum(b)) return parseInt(a, 10) - parseInt(b, 10);
+    return a < b ? -1 : (a > b ? 1 : 0);
+  });
+  return out;
+}
+
+function hintFor(type, v) {
+  if (type === "mhz" && isNum(v)) { var n = parseInt(v, 10); return n === 255 ? "= default" : "= " + (n + 100) + " MHz"; }
+  if (type === "clk" && isNum(v)) { var m = parseInt(v, 10); return m === 0 ? "= default" : "= " + (m / 100) + " MHz"; }
+  return "";
+}
+
+function validDate(v, fourDigit) {
+  var m = (fourDigit ? /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/ : /^(\d{1,2})\/(\d{1,2})\/(\d{2})$/).exec(v);
+  if (!m) return fourDigit ? "Use D/M/YYYY" : "Use D/M/YY";
+  var d = parseInt(m[1], 10), mo = parseInt(m[2], 10);
+  if (d < 1 || d > 31 || mo < 1 || mo > 12) return "Invalid day or month";
+  if (fourDigit) { var y = parseInt(m[3], 10); if (y < 1990 || y > 2099) return "Year must be 1990-2099"; }
+  return "";
+}
+
+/* "" = valid, otherwise error text */
+function validateValue(card, i, v, expert) {
+  var t = specOf(card)[i][1], n;
+  if (t === "byte" || t === "mhz" || t === "word" || t === "clk") {
+    if (!isNum(v) || v.length > 5) return "Must be a whole number";
+    n = parseInt(v, 10);
+    var max = (t === "word" || t === "clk") ? 65535 : 255;
+    return n > max ? "Must be 0-" + max : "";
+  }
+  if (t === "hex2") return /^[0-9A-Fa-f]{2}$/.test(v) ? "" : "Must be 2 hex digits";
+  if (t === "hex8") return /^[0-9A-Fa-f]{8}$/.test(v) ? "" : "Must be 8 hex digits";
+  if (t === "bits") {
+    if (!/^[01]{4}( [01]{4})*$/.test(v)) return "Groups of 4 bits, e.g. 1111 0000";
+    return v.length === card.values[i].length ? "" : "Must keep the same number of bits";
+  }
+  if (t === "date2") return validDate(v, false);
+  if (t === "date4") return validDate(v, true);
+  if (t === "pcb") return /^\d{1,5} \d{1,3}$/.test(v) ? "" : "Format: number space revision, e.g. 798 2";
+  if (t === "serial") {
+    if (expert) return (v.length >= 1 && v.length <= 16 && !/[^\x21-\x7E]/.test(v)) ? "" : "1-16 characters, no spaces";
+    if (card.layout === "v1") return /^[0-9A-Z]{1,10}$/.test(v) ? "" : "Up to 10 letters/digits";
+    return /^[A-Z]{3}[0-9]{5}$/.test(v) ? "" : "3 capital letters + 5 digits, e.g. ABS12345";
+  }
+  /* text */
+  if (v.length === 0) return "Cannot be empty";
+  if (v.length > 16) return "Max 16 characters";
+  return /[^\x20-\x7E]/.test(v) ? "Plain ASCII only" : "";
+}
+
+/* Matrox writes dates without leading zeros: 3/9/1998, 23/1/98 */
+function normDate(v) {
+  var p = v.split("/");
+  if (p.length !== 3 || !isNum(p[0]) || !isNum(p[1])) return v;
+  return parseInt(p[0], 10) + "/" + parseInt(p[1], 10) + "/" + p[2];
+}
+
+function todayFor(type, d) {
+  var y = d.getFullYear();
+  return d.getDate() + "/" + (d.getMonth() + 1) + "/" + (type === "date2" ? ((y % 100 < 10 ? "0" : "") + (y % 100)) : y);
+}
+
+function generatePin(card, vals) {
+  var out = [], i, tr;
+  for (i = 0; i < card.header.length; i++) out.push(card.header[i]);
+  for (i = 0; i < vals.length; i++) {
+    tr = new Array(parseInt(card.trails.charAt(i) || "0", 10) + 1).join(" "); /* factory trailing spaces */
+    out.push(i + ": " + vals[i] + tr);
+  }
+  return out.join("\r\n") + "\r\n";
+}
+/* ===== END CORE ===== */
+</script>
+
+<script type="text/javascript">
+/* ===== UI ===== */
+var cur = 0, vals = [], expert = false;
+
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function setStatus(s) { $("status").innerText = s; }
+function getFSO() { try { return new ActiveXObject("Scripting.FileSystemObject"); } catch (e) { return null; } }
+
+function buildCardList() {
+  var h = ['<select id="cardsel" onchange="cardChanged()">'], g = "", i, c;
+  for (i = 0; i < DB.cards.length; i++) {
+    c = DB.cards[i];
+    if (c.group !== g) { if (g) h.push("</optgroup>"); g = c.group; h.push('<optgroup label="' + esc(g) + '">'); }
+    h.push('<option value="' + i + '">' + esc(c.group + " - " + c.model + (c.note ? " (" + c.note + ")" : "")) + "</option>");
+  }
+  h.push("</optgroup></select>");
+  $("cardslot").innerHTML = h.join("");
+}
+
+function cardChanged() {
+  var keepSerial = vals.length ? serialValue() : "";
+  cur = parseInt($("cardsel").value, 10);
+  var card = DB.cards[cur], sp = specOf(card), i;
+  vals = [];
+  for (i = 0; i < card.values.length; i++) vals.push(card.values[i]);
+  /* user's serial carries over between cards; otherwise blank so it must be typed */
+  for (i = 0; i < sp.length; i++) if (sp[i][1] === "serial") vals[i] = keepSerial || (card.id.substr(0, 3) === "CPQ" ? card.values[i] : "");
+  render();
+  setStatus("Loaded factory values for " + card.group + " " + card.model);
+}
+
+function serialValue() {
+  var sp = specOf(DB.cards[cur]), i;
+  for (i = 0; i < sp.length; i++) if (sp[i][1] === "serial") return vals[i];
+  return "";
+}
+
+function render() {
+  var card = DB.cards[cur], sp = specOf(card), i, user = [], hw = [];
+  var fam = 0;
+  for (i = 0; i < DB.cards.length; i++) if (DB.cards[i].family === card.family) fam++;
+  $("cardinfo").innerHTML = "<b>" + esc(card.header[3] || "") + "</b> &nbsp;|&nbsp; " + esc(trim(card.header[4] || "")) +
+    " &nbsp;|&nbsp; PINS v" + esc(card.layout === "v1" ? "1 (old)" : card.values[3]) +
+    " &nbsp;|&nbsp; " + fam + " card(s) in this family" + (card.note ? " &nbsp;|&nbsp; <b>" + esc(card.note) + "</b>" : "");
+
+  for (i = 0; i < sp.length; i++) (sp[i][0] === "user" ? user : hw).push(i);
+  $("usergrid").innerHTML = table(user);
+  $("hwgrid").innerHTML = table(hw);
+  for (i = 0; i < sp.length; i++) refreshRow(i);
+  updatePreview();
+}
+
+function table(list) {
+  var h = ['<table class="grid"><tr><th>#</th><th>Parameter</th><th>Value</th></tr>'], j, i;
+  for (j = 0; j < list.length; j++) {
+    i = list[j];
+    var sp = specOf(DB.cards[cur])[i];
+    h.push('<tr id="row' + i + '"><td class="no">' + i + '</td><td class="lbl"><b>' + esc(sp[2]) +
+           '</b><br><span>' + esc(sp[3]) + '</span></td><td>' + editorHtml(i) +
+           '<div id="info' + i + '"></div></td></tr>');
+  }
+  h.push("</table>");
+  return h.join("");
+}
+
+function editorHtml(i) {
+  var card = DB.cards[cur], sp = specOf(card)[i], cls = sp[0], type = sp[1], v = vals[i];
+  if (cls === "user" || expert) {
+    var extra = "";
+    if (type === "date2" || type === "date4")
+      extra = ' <button onclick="setToday(' + i + ')">Today</button> <button onclick="setFactory(' + i + ')">Factory</button>';
+    var ph = (type === "serial") ? ' title="From the sticker on your card"' : "";
+    return '<input class="v" id="v' + i + '" value="' + esc(v) + '"' + ph +
+           ' onkeyup="valChange(' + i + ')" onchange="valChange(' + i + ',1)">' + extra;
+  }
+  var opts = fieldOptions(cur, i);
+  if (opts.length <= 1) {
+    return '<span class="fixed">' + esc(v) + '</span> <span class="hint">' + esc(hintFor(type, v)) +
+           (cls === "hw" ? " (same on every card of this type)" : " (fixed for this card)") + "</span>";
+  }
+  var h = ['<select class="v" id="v' + i + '" onchange="valChange(' + i + ')">'], k, o;
+  for (k = 0; k < opts.length; k++) {
+    o = opts[k];
+    h.push('<option value="' + esc(o) + '"' + (o === v ? " selected" : "") + ">" + esc(o) +
+           (hintFor(type, o) ? "  " + esc(hintFor(type, o)) : "") +
+           (o === card.values[i] ? "   [factory]" : "") + "</option>");
+  }
+  h.push("</select>");
+  return h.join("");
+}
+
+function valChange(i, commit) {
+  var card = DB.cards[cur], type = specOf(card)[i][1], el = $("v" + i), v = el.value;
+  if (type === "serial" && !expert) { var u = v.toUpperCase(); if (u !== v) { el.value = u; v = u; } }
+  if (commit && (type === "date2" || type === "date4")) { v = normDate(trim(v)); el.value = v; }
+  vals[i] = (el.tagName === "SELECT") ? v : trim(v);
+  refreshRow(i); updatePreview();
+}
+
+function setToday(i) { $("v" + i).value = todayFor(specOf(DB.cards[cur])[i][1], new Date()); valChange(i, 1); }
+function setFactory(i) { $("v" + i).value = DB.cards[cur].values[i]; valChange(i, 1); }
+
+function refreshRow(i) {
+  var card = DB.cards[cur], sp = specOf(card)[i], v = vals[i], row = $("row" + i), info = $("info" + i);
+  if (!row) return;
+  var err = validateValue(card, i, v, expert), h = "";
+  if (sp[1] === "serial" && v === "") err = "Required - type the serial number from your card's sticker";
+  if (err) h = '<span class="err">' + esc(err) + "</span>";
+  else if ($("v" + i) && $("v" + i).tagName === "INPUT" && hintFor(sp[1], v)) h = '<span class="hint">' + esc(hintFor(sp[1], v)) + "</span>";
+  var changed = v !== card.values[i] && sp[1] !== "serial";
+  if (changed && sp[0] !== "user") h += (h ? "<br>" : "") + '<span class="warn">Not this card\'s factory value (' + esc(card.values[i]) + ")</span>";
+  info.innerHTML = h;
+  row.className = err ? "bad" : (changed && sp[0] !== "user" ? "chg" : "");
+}
+
+function updatePreview() { $("preview").value = generatePin(DB.cards[cur], vals); }
+
+function errorList() {
+  var card = DB.cards[cur], sp = specOf(card), out = [], i;
+  for (i = 0; i < sp.length; i++) {
+    var e = validateValue(card, i, vals[i], expert);
+    if (sp[i][1] === "serial" && vals[i] === "") e = "required";
+    if (e) out.push(i + " " + sp[i][2] + ": " + e);
+  }
+  return out;
+}
+
+function expertClick() {
+  if ($("expert").checked && !confirm("Expert mode lets you type ANY value into every field, including ones that identify the card.\n\nWrong values can stop the card from booting. Continue?")) {
+    $("expert").checked = false; return;
+  }
+  expert = $("expert").checked;
+  render();
+}
+
+function resetClick() { if (confirm("Reset all values to this card's factory dump (serial is kept)?")) cardChanged(); }
+
+function saveClick() {
+  var errs = errorList();
+  if (errs.length) { alert("Please fix these fields first:\n\n" + errs.join("\n")); return; }
+  var text = generatePin(DB.cards[cur], vals), path = trim($("savepath").value), fso = getFSO();
+  if (fso) {
+    if (!path) { alert("Enter a file name to save to."); return; }
+    try {
+      if (fso.FileExists(path) && !confirm(path + " already exists. Overwrite?")) return;
+      var ts = fso.CreateTextFile(path, true, false);
+      ts.Write(text); ts.Close();
+      setStatus("Saved " + path);
+      alert("Saved " + path + "\n\nTo program the card (from plain DOS, in the MGA\\SETUP folder):\n\nPROGBIOS -i <biosfile>.bin -s " +
+            path.replace(/^.*[\\\/]/, "") + " -k");
+    } catch (e) { alert("Could not save file:\n" + path + "\n\n" + e.message); }
+    return;
+  }
+  try { /* browser fallback */
+    var name = path.replace(/^.*[\\\/]/, "") || "MYPINS.TXT";
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([text], { type: "text/plain" })); a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setStatus("Downloaded " + name);
+  } catch (e2) { alert("Saving is not supported here. Copy the text from the preview box instead."); }
+}
+
+window.onload = function () {
+  try { window.resizeTo(960, 800); } catch (e) {}
+  buildCardList();
+  cardChanged();
+};
+</script>
+</head>
+<body>
+<div id="bar">
+  <b>Card type:</b> <span id="cardslot"></span>
+  &nbsp; <button onclick="resetClick()">Reset to factory</button>
+  &nbsp; <label><input type="checkbox" id="expert" onclick="expertClick()"> Expert mode</label>
+</div>
+<div id="cardinfo"></div>
+<div id="main">
+  <h3>1. Your card</h3>
+  <div id="usergrid"></div>
+  <h3>2. Hardware parameters</h3>
+  <div class="hint" style="margin-bottom:4px">Drop-downs list the values used by real cards of this type. The card's own factory value is marked [factory].</div>
+  <div id="hwgrid"></div>
+  <div id="savebox">
+    <h3 style="margin-top:0">3. Save</h3>
+    Save to: <input class="path" id="savepath" type="text" value="C:\MYPINS.TXT">
+    <button onclick="saveClick()"><b>Generate &amp; Save</b></button>
+    <div class="hint" style="margin-top:6px">Then from plain DOS: <code>PROGBIOS -i &lt;biosfile&gt;.bin -s MYPINS.TXT -k</code></div>
+    <br><b>Preview</b> (exactly what will be saved)<br>
+    <textarea id="preview" readonly wrap="off"></textarea>
+  </div>
+</div>
+<div id="status">Ready</div>
+</body>
+</html>

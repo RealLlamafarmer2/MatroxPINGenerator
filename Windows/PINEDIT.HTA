@@ -1,0 +1,329 @@
+<!-- Matrox PINS Generator - Copyright (C) 2026 llamafarmer2 - GPL-3.0 (see LICENSE) -->
+<html>
+<head>
+<title>Matrox PIN Generator</title>
+<HTA:APPLICATION ID="PinGen" APPLICATIONNAME="MatroxPinGenerator" BORDER="thick"
+  CAPTION="yes" SHOWINTASKBAR="yes" SINGLEINSTANCE="no" SYSMENU="yes"
+  WINDOWSTATE="normal" SCROLL="yes" INNERBORDER="no" />
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<style type="text/css">
+body { font-family: Tahoma, Verdana, Arial, sans-serif; font-size: 9pt; margin: 0; background: #ECE9D8; color: #000; }
+#bar { background: #D4D0C8; border-bottom: 1px solid #808080; padding: 8px 10px; }
+#bar select { font-family: Tahoma, Arial; font-size: 10pt; }
+#bar b { font-size: 10pt; }
+#cardinfo { padding: 6px 10px; background: #FFFFE8; border-bottom: 1px solid #A0A0A0; }
+#main { padding: 8px 10px; }
+h3 { font-size: 10pt; margin: 12px 0 4px 0; color: #003070; }
+table.grid { border-collapse: collapse; background: #FFFFFF; width: 100%; }
+table.grid th { background: #D4D0C8; border: 1px solid #A0A0A0; padding: 3px 6px; text-align: left; }
+table.grid td { border: 1px solid #C8C8C8; padding: 3px 6px; vertical-align: top; }
+td.no { text-align: right; color: #555; width: 22px; }
+td.lbl { width: 190px; }
+td.lbl span { color: #666; font-size: 8pt; }
+input.v, select.v { font-family: "Courier New", monospace; font-size: 9pt; }
+input.v { width: 190px; }
+.fixed { font-family: "Courier New", monospace; color: #555; }
+tr.chg td { background: #FFF3C0; }
+tr.bad td { background: #FFD8D8; }
+.hint { color: #305080; font-size: 8pt; }
+.warn { color: #A05000; font-size: 8pt; }
+.err { color: #C00000; font-weight: bold; font-size: 8pt; }
+#savebox { background: #FFFFFF; border: 1px solid #A0A0A0; padding: 8px; margin-top: 12px; }
+#savebox input.path { font-family: Tahoma, Arial; font-size: 9pt; width: 280px; }
+#preview { font-family: "Courier New", monospace; font-size: 9pt; width: 100%; height: 230px; }
+#status { padding: 4px 10px; background: #D4D0C8; border-top: 1px solid #808080; }
+code { font-family: "Courier New", monospace; background: #EEE; padding: 0 3px; }
+</style>
+
+<script type="text/javascript">
+/* ---- Card database (generated from 37 real PROGBIOS dumps by build.py) ---- */
+var DB = {"layouts":{"v1":[["fixed","byte","Structure length","Size of the PIN block in bytes."],["card","word","Product ID","Board product identifier."],["user","serial","Serial number","From the sticker on your card."],["card","date4","Manufacturing date","Date the board was made."],["card","word","Revision ID","Board revision."],["card","text","PCB info","PCB information."],["hw","word","RAMDAC type","RAMDAC type code."],["card","text","Pixel clock limits","Pixel clock limits (0 = default)."],["hw","word","LCLK max","0 = default."],["hw","word","Clock setting 9","0 = default."],["hw","clk","Base clock","In 1/100 MHz (5000 = 50.00 MHz)."],["hw","clk","Clock, 4MB","In 1/100 MHz, 0 = default."],["hw","clk","Clock, 8MB","In 1/100 MHz, 0 = default."],["hw","word","Clock modifier","0 = default."],["hw","clk","Test clock","In 1/100 MHz, 0 = default."],["hw","clk","VGA frequency 1","In 1/100 MHz (2517 = 25.17 MHz)."],["hw","clk","VGA frequency 2","In 1/100 MHz (2832 = 28.32 MHz)."],["user","date4","Programming date","Date the PIN was written."],["user","word","Programming count","How many times the PIN has been programmed."],["hw","bits","Options","32 option bits."],["hw","bits","Feature flags","32 feature bits."],["hw","word","VGA clock","VGA clock setting."],["fixed","text","Structure revision","PIN structure revision."],["card","word","Reserved","Unused."],["card","word","Reserved","Unused."],["card","word","Reserved / check","Kept from the factory dump."]],"v2":[["fixed","text","PIN signature","Marks the start of the PIN block."],["fixed","byte","Structure length","Size of the PIN block in bytes."],["fixed","byte","Reserved","Unused."],["fixed","text","PIN version","PIN structure version for this card."],["user","date2","Programming date","Date the PIN was written."],["user","word","Programming count","How many times the PIN has been programmed."],["card","bits","Product ID","Board product identifier bits."],["user","serial","Serial number","From the sticker on your card: 3 capital letters + 5 digits."],["card","text","Card version","Card version from the sticker, e.g. 001B, 205A."],["card","pcb","PCB number + revision","Printed on the PCB, e.g. 644 00 (major / minor revision)."],["hw","bits","Feature flags","32 feature bits."],["hw","hex2","RAMDAC type","RAMDAC type code."],["hw","mhz","RAMDAC speed","Max RAMDAC speed."],["hw","mhz","Max pixel clock","Max pixel clock."],["hw","mhz","Graphics engine clock","System / engine PLL."],["hw","mhz","Memory clock","Memory clock."],["hw","mhz","Engine clock, 4MB","Engine clock used with 4MB memory."],["hw","mhz","Engine clock, 8MB","Engine clock used with 8MB memory."],["hw","byte","Clock modifier","Clock modifier."],["hw","byte","Test clock","Test clock (255 = default)."],["hw","byte","VGA frequency 1","Default VGA pixel frequency 1 (255 = default)."],["hw","byte","VGA frequency 2","Default VGA pixel frequency 2 (255 = default)."],["hw","bits","MCTLWTST memory timing","Memory controller wait-state bits."],["hw","bits","Video control","Video control bits."],["hw","mhz","Engine clock, 12MB","Engine clock used with 12MB memory."],["hw","mhz","Engine clock, 16MB","Engine clock used with 16MB memory."],["hw","byte","Reserved","Unused (255)."],["hw","byte","Reserved","Unused (255)."],["hw","byte","Reserved","Unused (255)."],["hw","byte","Reserved","Unused (255)."],["hw","byte","Reserved","Unused (255)."],["hw","byte","Reserved","Unused (255)."],["hw","byte","Reserved","Unused (255)."],["hw","byte","Reserved","Unused (255)."],["fixed","byte","PIN checksum","Kept from the factory dump; PROGBIOS accepts edited PINS files without changing it."]],"v3":[["fixed","text","PIN signature","Marks the start of the PIN block."],["fixed","byte","Structure length","Size of the PIN block in bytes."],["fixed","byte","Reserved","Unused."],["fixed","text","PIN version","PIN structure version for this card."],["user","date4","Programming date","Date the PIN was written."],["user","word","Programming count","How many times the PIN has been programmed."],["card","bits","Product ID","Board product identifier bits."],["user","serial","Serial number","From the sticker on your card: 3 capital letters + 5 digits."],["card","text","Card version","Card version from the sticker, e.g. 001B, 205A."],["card","pcb","PCB number + revision","Printed on the PCB, e.g. 644 00 (major / minor revision)."],["hw","mhz","Max RAMDAC frequency","130 = 230 MHz, 150 = 250 MHz."],["hw","mhz","Max pixel clock, 8 bpp","Stored as MHz-100."],["hw","mhz","Max pixel clock, 16 bpp","Stored as MHz-100."],["hw","mhz","Max pixel clock, 24 bpp","Stored as MHz-100."],["hw","mhz","Max pixel clock, 32 bpp","Stored as MHz-100."],["hw","byte","VGA1 pixel clock","255 = default."],["hw","byte","VGA2 pixel clock","255 = default."],["hw","byte","VGA graphics clock","Graphics clock in VGA modes, MHz."],["hw","byte","2D clock, no mem. expansion","Graphics clock without memory expansion, MHz."],["hw","byte","2D clock, +2MB expansion","Graphics clock with 2MB memory expansion, MHz."],["hw","byte","2D clock, +4MB expansion","Graphics clock with 4MB memory expansion, MHz."],["hw","byte","2D clock, +8MB expansion","Graphics clock with 8MB memory expansion, MHz."],["hw","hex8","Memory control word","Memory controller timing (MCTLWTST), hex."],["hw","byte","Board options","Undocumented option byte."],["hw","byte","Video output options","Video output options."],["hw","byte","Option byte 25","Undocumented (memory configuration)."],["hw","byte","Option byte 26","Undocumented."],["hw","byte","Option byte 27","Undocumented (memory read-back timing)."],["hw","byte","Option byte 28","Undocumented (memory read-back timing)."],["hw","byte","Option byte 29","Undocumented (OPTION2 register)."],["hw","byte","Option byte 30","Undocumented."],["hw","byte","3D graphics clock","Graphics clock for 3D, MHz."],["hw","byte","Option byte 32","Undocumented."],["hw","byte","Option byte 33","Undocumented."],["fixed","byte","PIN checksum","Covers 8 hidden PINS bytes PROGBIOS does not dump, so it cannot be recalculated from this file; kept from the factory dump."]]},"cards":[{"id":"MILL","group":"Millennium","model":"Millennium (TVP3026, old PINS)","note":"Old v1 PINS layout","family":"MILL","layout":"v1","header":["MGA Bios Programming Utility v1.73d","(C) Matrox Graphics Inc. (1997)","","Matrox Millennium - TVP 3026","VGA Enabled - BIOS V1.5 ",""],"values":["64","0","0000000","13/12/1995","5","1152 4","0","0 0","0","0","5000","0","0","0","0","2517","2832","13/12/1995","3","0000 0000 0000 0000 0000 0000 0000 0000","0000 0000 0000 0000 0000 0000 0000 0000","259","0.0","0","0","46336"],"trails":"00000000000000000000000000"},{"id":"MYST004","group":"Mystique","model":"Model 004","note":"","family":"MYST","layout":"v2","header":["MGA Bios Programming Utility v1.76d","(C) Matrox Graphics Inc. (1997)","","Matrox Mystique","VGA Enabled - BIOS V1.8 ",""],"values":["PIN","64","255","2.0","18/10/98","3","0000 0001 0000 0000","ABC82266","004","644 0","1111 1111 1111 1111 1111 1111 1111 1111","00","70","70","60","255","60","50","55","255","255","255","1111 1111","1110 1110","255","255","255","255","255","255","255","255","255","255","129"],"trails":"10000000000000000000000011111111110"},{"id":"MYST005","group":"Mystique","model":"Model 005 (MYST/4I)","note":"","family":"MYST","layout":"v2","header":["MGA Bios Programming Utility v1.73d","(C) Matrox Graphics Inc. (1997)","","Matrox Mystique","VGA Enabled - BIOS V1.4 ",""],"values":["PIN","64","255","2.0","16/6/98","6","0000 0001 0000 0000","ABD94363","005","644 0","1111 1111 1111 1111 1111 1111 1111 1111","00","70","70","60","255","60","50","55","255","255","255","1111 1111","1110 1110","255","255","255","255","255","255","255","255","255","255","254"],"trails":"10000000000000000000000011111111110"},{"id":"MYST006","group":"Mystique","model":"Model 006 (MYST/4I)","note":"","family":"MYST","layout":"v2","header":["MGA Bios Programming Utility v1.76d","(C) Matrox Graphics Inc. (1997)","","Matrox Mystique","VGA Enabled - BIOS V1.8 ",""],"values":["PIN","64","255","2.0","3/10/98","5","0000 0000 0000 0000","EAE83178","006","644 0","1111 1111 1111 1111 1111 1111 1111 1111","00","70","70","60","255","60","50","55","255","255","255","1111 1111","1110 1110","255","255","255","255","255","255","255","255","255","255","100"],"trails":"10000000000000000000000011111111110"},{"id":"CPQ296677","group":"Mystique 220","model":"Compaq OEM 296677-001 (board 007414-001)","note":"Compaq OEM - based on Model 311; ID fields estimated","family":"M220","layout":"v2","header":["MGA Bios Programming Utility v1.80d","(C) Matrox Graphics Inc. (1998)","","Matrox Mystique 220","VGA Enabled - BIOS V1.5 ",""],"values":["PIN","64","255","2.1","29/1/98","2","0000 0000 0000 0000","CPQ24089","311","644 3","1111 1111 1111 1111 1111 1111 1111 1111","00","120","120","66","255","66","60","50","255","255","255","1111 1111","1110 1110","255","255","255","255","255","255","255","255","255","255","162"],"trails":"10000000000000000000000011111111110"},{"id":"M220305","group":"Mystique 220","model":"Model 305","note":"","family":"M220","layout":"v2","header":["MGA Bios Programming Utility v1.76d","(C) Matrox Graphics Inc. (1997)","","Matrox Mystique 220","VGA Enabled - BIOS V1.5 ",""],"values":["PIN","64","255","2.1","23/1/98","1","0001 0001 0000 0000","GAC73382","305","644 3","1111 1111 1111 1111 1111 1111 1111 1111","00","120","120","66","255","66","60","50","255","255","255","1111 1111","1110 1110","255","255","255","255","255","255","255","255","255","255","87"],"trails":"10000000000000000000000011111111110"},{"id":"M220308","group":"Mystique 220","model":"Model 308","note":"PINS v2.0","family":"M220","layout":"v2","header":["MGA Bios Programming Utility v1.80d","(C) Matrox Graphics Inc. (1998)","","Matrox Mystique 220","VGA Enabled - BIOS V1.8 ",""],"values":["PIN","64","255","2.0","30/12/98","5","0000 0001 0000 0000","CBY54268","308","644 3","1111 1111 1111 1111 1111 1111 1111 1111","00","120","120","66","255","66","60","255","255","255","255","1111 1111","1110 1110","255","255","255","255","255","255","255","255","255","255","24"],"trails":"10000000000000000000000011111111110"},{"id":"M220311","group":"Mystique 220","model":"Model 311","note":"","family":"M220","layout":"v2","header":["MGA Bios Programming Utility v1.80d","(C) Matrox Graphics Inc. (1998)","","Matrox Mystique 220","VGA Enabled - BIOS V1.5 ",""],"values":["PIN","64","255","2.1","29/1/98","2","0000 0000 0000 0000","EBB51410","311","644 3","1111 1111 1111 1111 1111 1111 1111 1111","00","120","120","66","255","66","60","50","255","255","255","1111 1111","1110 1110","255","255","255","255","255","255","255","255","255","255","162"],"trails":"10000000000000000000000011111111110"},{"id":"MIL27030","group":"Millennium II","model":"Model 004 (703-00 rev.A) PCI","note":"","family":"MIL2","layout":"v2","header":["MGA Bios Programming Utility v1.76d","(C) Matrox Graphics Inc. (1997)","","Matrox Millennium II","VGA Enabled - BIOS V1.1 ",""],"values":["PIN","64","255","2.1","14/3/98","2","0001 0000 0000 0000","CCJ11039","004","703 0","1111 1111 1111 1111 1111 1111 1111 1111","26","150","150","54","255","66","62","54","255","255","255","1111 1111","1110 1110","58","54","255","255","255","255","255","255","255","255","138"],"trails":"10000000000000000000000011111111110"},{"id":"G100100A","group":"G100","model":"Model 100A (4MB)","note":"","family":"G100","layout":"v3","header":["MGA Bios Programming Utility v1.76d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G100 AGP","VGA Enabled - BIOS V1.1 ",""],"values":["PIN","64","255","3.0","12/5/1998","3","0001 0001 0000 0000","ABR54247","100A","790 1","130","130","130","116","62","255","255","62","62","62","62","62","01032521","0","238","116","64","255","255","255","255","255","255","255","53"],"trails":"10000000000000000000000000000000000"},{"id":"G1PR101","group":"G100","model":"Productiva 8MB, Model 101 (G+/PROA/8BN/5)","note":"","family":"G100","layout":"v3","header":["MGA Bios Programming Utility v1.73d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G100 AGP","VGA Enabled - BIOS V1.4 ",""],"values":["PIN","64","255","3.0","11/8/1998","5","0001 0000 0010 0000","CCL31247","101","815 1","130","130","130","76","35","255","255","66","66","66","66","66","01232521","21","238","116","128","255","255","255","255","255","255","255","37"],"trails":"10000000000000000000000000000000000"},{"id":"G2SD001A","group":"G200 SD (G2+/SDA)","model":"Model 001A","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.73d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA G200 AGP","VGA Enabled - BIOS V1.3 ",""],"values":["PIN","64","255","3.0","31/8/1998","4","0000 0000 0000 0000","CBD35231","001A","834 0","130","130","130","103","52","255","255","62","62","62","62","62","04244ca1","16","238","4","128","136","0","8","255","84","67","255","70"],"trails":"10000000000000000000000000000000000"},{"id":"G2SD001B","group":"G200 SD (G2+/SDA)","model":"Model 001B","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.73d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.2 ",""],"values":["PIN","64","255","3.0","15/8/1998","3","0000 0001 0000 0000","FAG00217","001B","834 0","130","130","130","103","52","255","255","62","62","62","62","62","04244ca1","16","238","4","128","136","0","8","255","79","67","255","79"],"trails":"10000000000000000000000000000000000"},{"id":"G2SD001C","group":"G200 SD (G2+/SDA)","model":"Model 001C","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.76d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.2",""],"values":["PIN","64","255","3.0","3/8/1998","2","0000 0000 0000 0000","ABT03808","001C","834 0","130","130","130","103","52","255","255","62","62","62","62","62","04244ca1","16","238","4","128","136","0","8","255","84","67","255","79"],"trails":"00000000000000000000000000000000000"},{"id":"G2SD003A","group":"G200 SD (G2+/SDA)","model":"Model 003A","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.76d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.5 ",""],"values":["PIN","64","255","3.0","16/10/1998","4","0000 0010 0000 0000","ABS77832","003A","834 0","130","130","130","103","52","255","255","62","62","62","62","62","04244ca1","16","238","4","128","136","0","8","255","84","67","255","247"],"trails":"10000000000000000000000000000000000"},{"id":"G2SD004","group":"G200 SD (G2+/SDA)","model":"Model 004","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.73d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.5 ",""],"values":["PIN","64","255","3.0","1/11/1998","3","0000 0001 0000 0000","ABT57874","004","834 0","130","130","130","103","52","255","255","62","62","62","62","62","04244ca1","16","238","4","128","136","0","8","255","84","67","255","35"],"trails":"10000000000000000000000000000000000"},{"id":"G2SD004C","group":"G200 SD (G2+/SDA)","model":"Model 004C","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.76d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.3 ",""],"values":["PIN","64","255","3.0","1/9/1998","2","0000 0001 0000 0000","FAG91249","004C","834 0","130","130","130","103","52","255","255","62","62","62","62","62","04244ca1","16","238","4","128","136","0","8","255","84","67","255","48"],"trails":"10000000000000000000000000000000000"},{"id":"G2SD005A","group":"G200 SD (G2+/SDA)","model":"Model 005A","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.80d","(C) Matrox Graphics Inc. (1998)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.6",""],"values":["PIN","64","255","3.0","29/11/1998","4","0001 0001 0000 0000","FAH75137","005A","834 0","130","130","130","103","52","255","255","62","62","62","62","62","04244ca1","16","238","4","128","136","0","8","255","84","67","255","196"],"trails":"00000000000000000000000000000000000"},{"id":"G2MS000","group":"Millennium G200 SD (G2+/MSDA/8)","model":"Model 000","note":"250 MHz RAMDAC","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.73d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.3 ",""],"values":["PIN","64","255","3.0","5/11/1998","2","0000 0001 0000 0000","FAJ19396","000","834 0","150","150","150","114","62","255","255","62","62","62","62","62","04244ca1","16","238","4","128","136","0","8","255","84","67","221","217"],"trails":"10000001100000000000000000000000000"},{"id":"G2MY000A","group":"Mystique G200 (G2+/MYSA)","model":"Model 000A","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.76d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.3 TVO",""],"values":["PIN","64","255","3.0","7/10/1998","4","0001 0001 0100 0000","FAH05735","000A","834 0","130","130","130","103","52","255","255","62","62","62","62","62","04244ca1","16","238","4","128","136","0","8","254","84","67","255","196"],"trails":"00000000000000000000000000000000000"},{"id":"G2MY000B","group":"Mystique G200 (G2+/MYSA)","model":"Model 000B","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.76d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.3 ",""],"values":["PIN","64","255","3.0","14/11/1998","4","0000 0000 0100 0000","ABT93273","000B","834 0","130","130","130","103","52","255","255","62","62","62","62","62","04244ca1","16","238","4","128","136","0","8","254","84","67","255","203"],"trails":"10000000000000000000000000000000000"},{"id":"G2MY001C","group":"Mystique G200 (G2+/MYSA)","model":"Model 001C","note":"250 MHz RAMDAC","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.78d","(C) Matrox Graphics Inc. (1998)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.6 ",""],"values":["PIN","64","255","3.0","1/12/1998","11","0000 0000 0100 0000","ABU39209","001C","834 0","150","150","150","114","62","255","255","62","62","62","62","62","04244ca1","16","238","4","128","136","0","8","254","84","67","221","85"],"trails":"10000000000000000000000000000000000"},{"id":"G2MY002","group":"Mystique G200 (G2+/MYSA)","model":"Model 002","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.76d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.3",""],"values":["PIN","64","255","3.0","29/9/1998","5","0001 0001 0100 0000","FAH93346","002","834 0","130","130","130","103","52","255","255","62","62","62","62","62","04244ca1","16","238","4","128","136","0","8","254","79","67","255","1"],"trails":"00000000000000000000000000000000000"},{"id":"G2MY002A","group":"Mystique G200 (G2+/MYSA)","model":"Model 002A","note":"250 MHz RAMDAC","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.73d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.3 ",""],"values":["PIN","64","255","3.0","28/9/1998","2","0000 0001 0100 0000","FAH86014","002A","834 0","150","150","150","114","62","255","255","62","62","62","62","62","04244ca1","16","238","4","128","136","0","8","254","84","67","221","176"],"trails":"10000000000000000000000000000000000"},{"id":"G2MI201","group":"Millennium G200 (G2+/MILA)","model":"Model 201","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.73d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.3 ",""],"values":["PIN","64","255","3.0","3/9/1998","4","0001 0000 0110 0000","ABS12345","201","798 2","150","150","150","103","52","255","255","62","62","62","62","62","04244ca1","0","238","3","128","136","0","8","255","84","67","255","25"],"trails":"10000001100000000000000000000000000"},{"id":"G2MI202","group":"Millennium G200 (G2+/MILA)","model":"Model 202","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.76d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.5 ",""],"values":["PIN","64","255","3.0","17/10/1998","4","0000 0001 0110 0000","FAF58641","202","798 2","150","150","150","114","62","255","255","66","66","66","66","66","04244ca1","0","238","3","128","136","0","8","255","84","67","255","208"],"trails":"10000000000000000000000000000000000"},{"id":"G2MI203A","group":"Millennium G200 (G2+/MILA)","model":"Model 203A","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.73d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.3 ",""],"values":["PIN","64","255","3.0","3/9/1998","3","0001 0010 0110 0000","ABS58189","203A","798 2","150","150","150","103","52","255","255","62","62","62","62","62","042450a1","0","238","3","128","136","0","8","255","84","67","255","193"],"trails":"10000000000000000000000000000000000"},{"id":"G2MI205A","group":"Millennium G200 (G2+/MILA)","model":"Model 205A","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.73d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.3 ",""],"values":["PIN","64","255","3.0","5/9/1998","3","0001 0010 0110 0000","ABS12345","205A","798 2","150","150","150","103","52","255","255","62","62","62","62","62","042450a1","0","238","3","128","136","0","8","255","84","67","255","181"],"trails":"10000001100000000000000000000000000"},{"id":"G2MI206","group":"Millennium G200 (G2+/MILA)","model":"Model 206","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.76d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.5 ",""],"values":["PIN","64","255","3.0","15/10/1998","1","0000 0000 0110 0000","ABS12345","206","798 2","150","150","150","124","68","255","255","69","69","69","69","69","04244ca1","0","238","3","128","136","0","8","255","84","67","255","148"],"trails":"10000000000000000000000000000000000"},{"id":"G2MI206X","group":"Millennium G200 (G2+/MILA)","model":"Model 206 (faster memory)","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.76d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.3 ",""],"values":["PIN","64","255","3.0","4/9/1998","2","0001 0000 0110 0000","CCR27809","206","798 2","150","150","150","103","52","255","255","62","62","62","62","62","042450a1","0","238","3","128","136","0","8","255","84","67","255","4"],"trails":"10000000000000000000000000000000000"},{"id":"G2MI206A","group":"Millennium G200 (G2+/MILA)","model":"Model 206A","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.76d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.3 ",""],"values":["PIN","64","255","3.0","3/9/1998","2","0001 0001 0110 0000","FAH10855","206A","798 2","150","150","150","103","52","255","255","62","62","62","62","62","042450a1","0","238","3","128","136","0","8","255","84","67","255","211"],"trails":"10000000000000000000000000000000000"},{"id":"G2MI207A","group":"Millennium G200 (G2+/MILA)","model":"Model 207A","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.76d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.3 ",""],"values":["PIN","64","255","3.0","7/10/1998","2","0001 0010 0110 0000","ABU12345","207A","798 2","150","150","150","132","76","255","255","66","72","66","66","66","042450a1","0","238","3","128","136","0","8","255","90","67","204","124"],"trails":"10000000000000000000000000000000000"},{"id":"G2MI208","group":"Millennium G200 (G2+/MILA)","model":"Model 208","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.78d","(C) Matrox Graphics Inc. (1998)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.6 ",""],"values":["PIN","64","255","3.0","10/12/1998","3","0000 0000 0110 0000","CCU48389","208","798 2","150","150","150","114","62","255","255","66","66","66","66","66","042450a1","0","238","3","128","136","0","8","255","84","67","255","187"],"trails":"10000000000000000000000000000000000"},{"id":"G2MI209","group":"Millennium G200 (G2+/MILA)","model":"Model 209","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.78d","(C) Matrox Graphics Inc. (1998)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.6 ",""],"values":["PIN","64","255","3.0","9/12/1998","3","0001 0000 0110 0000","CCV45875","209","798 2","150","150","150","132","76","255","255","66","72","66","66","66","042450a1","0","238","3","128","136","0","8","255","90","67","204","201"],"trails":"10000000000000000000000000000000000"},{"id":"G2MI209A","group":"Millennium G200 (G2+/MILA)","model":"Model 209A","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.73d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.3 ",""],"values":["PIN","64","255","3.0","21/10/1998","2","0001 0010 0110 0000","ABV07128","209A","798 2","150","150","150","132","76","255","255","66","72","66","66","66","042450a1","0","238","3","128","136","0","8","255","90","67","204","114"],"trails":"10000000000000000000000000000000000"},{"id":"G2MI209B","group":"Millennium G200 (G2+/MILA)","model":"Model 209B","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.80d","(C) Matrox Graphics Inc. (1998)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.3 ",""],"values":["PIN","64","255","3.0","6/11/1998","2","0001 0001 0110 0000","GAK46469","209B","798 2","150","150","150","103","52","255","255","62","62","62","62","62","042450a1","0","238","3","128","136","0","8","255","84","67","255","89"],"trails":"10000000000000000000000000000000000"},{"id":"G2MA002A","group":"Marvel G200","model":"Model 002A (no TV)","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.78d","(C) Matrox Graphics Inc. (1998)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.5 ",""],"values":["PIN","64","255","3.0","20/10/1998","3","0000 0001 1000 0000","ABU00675","002A","818 0","130","130","130","103","52","255","255","62","62","62","62","62","04244ca1","16","238","4","128","136","0","8","242","84","67","255","43"],"trails":"10000000000000000000000000000000000"},{"id":"G2MT003A","group":"Marvel G200","model":"Model 003A (G200TV)","note":"","family":"G200","layout":"v3","header":["MGA Bios Programming Utility v1.76d","(C) Matrox Graphics Inc. (1997)","","Matrox MGA-G200 AGP","VGA Enabled - BIOS V1.4 TVO ",""],"values":["PIN","64","255","3.0","28/10/1998","4","0000 0000 1000 0000","ABU31574","003A","818 0","130","130","130","103","52","255","255","62","62","62","62","62","04244ca1","16","238","4","128","136","0","8","226","84","67","255","52"],"trails":"10000000000000000000000000000000000"}]};
+</script>
+
+<script type="text/javascript" id="core">
+/* ===== CORE LOGIC (no UI) - ES3 so it runs in old Windows script engines ===== */
+function trim(s) { return s.replace(/^\s+|\s+$/g, ""); }
+function isNum(s) { return /^\d+$/.test(s); }
+
+function specOf(card) { return DB.layouts[card.layout]; }
+
+/* Values a field may take for this card (non-expert mode). */
+function fieldOptions(cardIdx, i) {
+  var card = DB.cards[cardIdx], sp = specOf(card)[i], seen = {}, out = [], k, c, v;
+  if (sp[0] !== "hw") return [card.values[i]];
+  for (k = 0; k < DB.cards.length; k++) {
+    c = DB.cards[k];
+    if (c.family !== card.family || c.layout !== card.layout) continue;
+    v = c.values[i];
+    if (!seen["_" + v]) { seen["_" + v] = 1; out.push(v); }
+  }
+  out.sort(function (a, b) {
+    if (isNum(a) && isNum(b)) return parseInt(a, 10) - parseInt(b, 10);
+    return a < b ? -1 : (a > b ? 1 : 0);
+  });
+  return out;
+}
+
+function hintFor(type, v) {
+  if (type === "mhz" && isNum(v)) { var n = parseInt(v, 10); return n === 255 ? "= default" : "= " + (n + 100) + " MHz"; }
+  if (type === "clk" && isNum(v)) { var m = parseInt(v, 10); return m === 0 ? "= default" : "= " + (m / 100) + " MHz"; }
+  return "";
+}
+
+function validDate(v, fourDigit) {
+  var m = (fourDigit ? /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/ : /^(\d{1,2})\/(\d{1,2})\/(\d{2})$/).exec(v);
+  if (!m) return fourDigit ? "Use D/M/YYYY" : "Use D/M/YY";
+  var d = parseInt(m[1], 10), mo = parseInt(m[2], 10);
+  if (d < 1 || d > 31 || mo < 1 || mo > 12) return "Invalid day or month";
+  if (fourDigit) { var y = parseInt(m[3], 10); if (y < 1990 || y > 2099) return "Year must be 1990-2099"; }
+  return "";
+}
+
+/* "" = valid, otherwise error text */
+function validateValue(card, i, v, expert) {
+  var t = specOf(card)[i][1], n;
+  if (t === "byte" || t === "mhz" || t === "word" || t === "clk") {
+    if (!isNum(v) || v.length > 5) return "Must be a whole number";
+    n = parseInt(v, 10);
+    var max = (t === "word" || t === "clk") ? 65535 : 255;
+    return n > max ? "Must be 0-" + max : "";
+  }
+  if (t === "hex2") return /^[0-9A-Fa-f]{2}$/.test(v) ? "" : "Must be 2 hex digits";
+  if (t === "hex8") return /^[0-9A-Fa-f]{8}$/.test(v) ? "" : "Must be 8 hex digits";
+  if (t === "bits") {
+    if (!/^[01]{4}( [01]{4})*$/.test(v)) return "Groups of 4 bits, e.g. 1111 0000";
+    return v.length === card.values[i].length ? "" : "Must keep the same number of bits";
+  }
+  if (t === "date2") return validDate(v, false);
+  if (t === "date4") return validDate(v, true);
+  if (t === "pcb") return /^\d{1,5} \d{1,3}$/.test(v) ? "" : "Format: number space revision, e.g. 798 2";
+  if (t === "serial") {
+    if (expert) return (v.length >= 1 && v.length <= 16 && !/[^\x21-\x7E]/.test(v)) ? "" : "1-16 characters, no spaces";
+    if (card.layout === "v1") return /^[0-9A-Z]{1,10}$/.test(v) ? "" : "Up to 10 letters/digits";
+    return /^[A-Z]{3}[0-9]{5}$/.test(v) ? "" : "3 capital letters + 5 digits, e.g. ABS12345";
+  }
+  /* text */
+  if (v.length === 0) return "Cannot be empty";
+  if (v.length > 16) return "Max 16 characters";
+  return /[^\x20-\x7E]/.test(v) ? "Plain ASCII only" : "";
+}
+
+/* Matrox writes dates without leading zeros: 3/9/1998, 23/1/98 */
+function normDate(v) {
+  var p = v.split("/");
+  if (p.length !== 3 || !isNum(p[0]) || !isNum(p[1])) return v;
+  return parseInt(p[0], 10) + "/" + parseInt(p[1], 10) + "/" + p[2];
+}
+
+function todayFor(type, d) {
+  var y = d.getFullYear();
+  return d.getDate() + "/" + (d.getMonth() + 1) + "/" + (type === "date2" ? ((y % 100 < 10 ? "0" : "") + (y % 100)) : y);
+}
+
+function generatePin(card, vals) {
+  var out = [], i, tr;
+  for (i = 0; i < card.header.length; i++) out.push(card.header[i]);
+  for (i = 0; i < vals.length; i++) {
+    tr = new Array(parseInt(card.trails.charAt(i) || "0", 10) + 1).join(" "); /* factory trailing spaces */
+    out.push(i + ": " + vals[i] + tr);
+  }
+  return out.join("\r\n") + "\r\n";
+}
+/* ===== END CORE ===== */
+</script>
+
+<script type="text/javascript">
+/* ===== UI ===== */
+var cur = 0, vals = [], expert = false;
+
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function setStatus(s) { $("status").innerText = s; }
+function getFSO() { try { return new ActiveXObject("Scripting.FileSystemObject"); } catch (e) { return null; } }
+
+function buildCardList() {
+  var h = ['<select id="cardsel" onchange="cardChanged()">'], g = "", i, c;
+  for (i = 0; i < DB.cards.length; i++) {
+    c = DB.cards[i];
+    if (c.group !== g) { if (g) h.push("</optgroup>"); g = c.group; h.push('<optgroup label="' + esc(g) + '">'); }
+    h.push('<option value="' + i + '">' + esc(c.group + " - " + c.model + (c.note ? " (" + c.note + ")" : "")) + "</option>");
+  }
+  h.push("</optgroup></select>");
+  $("cardslot").innerHTML = h.join("");
+}
+
+function cardChanged() {
+  var keepSerial = vals.length ? serialValue() : "";
+  cur = parseInt($("cardsel").value, 10);
+  var card = DB.cards[cur], sp = specOf(card), i;
+  vals = [];
+  for (i = 0; i < card.values.length; i++) vals.push(card.values[i]);
+  /* user's serial carries over between cards; otherwise blank so it must be typed */
+  for (i = 0; i < sp.length; i++) if (sp[i][1] === "serial") vals[i] = keepSerial || (card.id.substr(0, 3) === "CPQ" ? card.values[i] : "");
+  render();
+  setStatus("Loaded factory values for " + card.group + " " + card.model);
+}
+
+function serialValue() {
+  var sp = specOf(DB.cards[cur]), i;
+  for (i = 0; i < sp.length; i++) if (sp[i][1] === "serial") return vals[i];
+  return "";
+}
+
+function render() {
+  var card = DB.cards[cur], sp = specOf(card), i, user = [], hw = [];
+  var fam = 0;
+  for (i = 0; i < DB.cards.length; i++) if (DB.cards[i].family === card.family) fam++;
+  $("cardinfo").innerHTML = "<b>" + esc(card.header[3] || "") + "</b> &nbsp;|&nbsp; " + esc(trim(card.header[4] || "")) +
+    " &nbsp;|&nbsp; PINS v" + esc(card.layout === "v1" ? "1 (old)" : card.values[3]) +
+    " &nbsp;|&nbsp; " + fam + " card(s) in this family" + (card.note ? " &nbsp;|&nbsp; <b>" + esc(card.note) + "</b>" : "");
+
+  for (i = 0; i < sp.length; i++) (sp[i][0] === "user" ? user : hw).push(i);
+  $("usergrid").innerHTML = table(user);
+  $("hwgrid").innerHTML = table(hw);
+  for (i = 0; i < sp.length; i++) refreshRow(i);
+  updatePreview();
+}
+
+function table(list) {
+  var h = ['<table class="grid"><tr><th>#</th><th>Parameter</th><th>Value</th></tr>'], j, i;
+  for (j = 0; j < list.length; j++) {
+    i = list[j];
+    var sp = specOf(DB.cards[cur])[i];
+    h.push('<tr id="row' + i + '"><td class="no">' + i + '</td><td class="lbl"><b>' + esc(sp[2]) +
+           '</b><br><span>' + esc(sp[3]) + '</span></td><td>' + editorHtml(i) +
+           '<div id="info' + i + '"></div></td></tr>');
+  }
+  h.push("</table>");
+  return h.join("");
+}
+
+function editorHtml(i) {
+  var card = DB.cards[cur], sp = specOf(card)[i], cls = sp[0], type = sp[1], v = vals[i];
+  if (cls === "user" || expert) {
+    var extra = "";
+    if (type === "date2" || type === "date4")
+      extra = ' <button onclick="setToday(' + i + ')">Today</button> <button onclick="setFactory(' + i + ')">Factory</button>';
+    var ph = (type === "serial") ? ' title="From the sticker on your card"' : "";
+    return '<input class="v" id="v' + i + '" value="' + esc(v) + '"' + ph +
+           ' onkeyup="valChange(' + i + ')" onchange="valChange(' + i + ',1)">' + extra;
+  }
+  var opts = fieldOptions(cur, i);
+  if (opts.length <= 1) {
+    return '<span class="fixed">' + esc(v) + '</span> <span class="hint">' + esc(hintFor(type, v)) +
+           (cls === "hw" ? " (same on every card of this type)" : " (fixed for this card)") + "</span>";
+  }
+  var h = ['<select class="v" id="v' + i + '" onchange="valChange(' + i + ')">'], k, o;
+  for (k = 0; k < opts.length; k++) {
+    o = opts[k];
+    h.push('<option value="' + esc(o) + '"' + (o === v ? " selected" : "") + ">" + esc(o) +
+           (hintFor(type, o) ? "  " + esc(hintFor(type, o)) : "") +
+           (o === card.values[i] ? "   [factory]" : "") + "</option>");
+  }
+  h.push("</select>");
+  return h.join("");
+}
+
+function valChange(i, commit) {
+  var card = DB.cards[cur], type = specOf(card)[i][1], el = $("v" + i), v = el.value;
+  if (type === "serial" && !expert) { var u = v.toUpperCase(); if (u !== v) { el.value = u; v = u; } }
+  if (commit && (type === "date2" || type === "date4")) { v = normDate(trim(v)); el.value = v; }
+  vals[i] = (el.tagName === "SELECT") ? v : trim(v);
+  refreshRow(i); updatePreview();
+}
+
+function setToday(i) { $("v" + i).value = todayFor(specOf(DB.cards[cur])[i][1], new Date()); valChange(i, 1); }
+function setFactory(i) { $("v" + i).value = DB.cards[cur].values[i]; valChange(i, 1); }
+
+function refreshRow(i) {
+  var card = DB.cards[cur], sp = specOf(card)[i], v = vals[i], row = $("row" + i), info = $("info" + i);
+  if (!row) return;
+  var err = validateValue(card, i, v, expert), h = "";
+  if (sp[1] === "serial" && v === "") err = "Required - type the serial number from your card's sticker";
+  if (err) h = '<span class="err">' + esc(err) + "</span>";
+  else if ($("v" + i) && $("v" + i).tagName === "INPUT" && hintFor(sp[1], v)) h = '<span class="hint">' + esc(hintFor(sp[1], v)) + "</span>";
+  var changed = v !== card.values[i] && sp[1] !== "serial";
+  if (changed && sp[0] !== "user") h += (h ? "<br>" : "") + '<span class="warn">Not this card\'s factory value (' + esc(card.values[i]) + ")</span>";
+  info.innerHTML = h;
+  row.className = err ? "bad" : (changed && sp[0] !== "user" ? "chg" : "");
+}
+
+function updatePreview() { $("preview").value = generatePin(DB.cards[cur], vals); }
+
+function errorList() {
+  var card = DB.cards[cur], sp = specOf(card), out = [], i;
+  for (i = 0; i < sp.length; i++) {
+    var e = validateValue(card, i, vals[i], expert);
+    if (sp[i][1] === "serial" && vals[i] === "") e = "required";
+    if (e) out.push(i + " " + sp[i][2] + ": " + e);
+  }
+  return out;
+}
+
+function expertClick() {
+  if ($("expert").checked && !confirm("Expert mode lets you type ANY value into every field, including ones that identify the card.\n\nWrong values can stop the card from booting. Continue?")) {
+    $("expert").checked = false; return;
+  }
+  expert = $("expert").checked;
+  render();
+}
+
+function resetClick() { if (confirm("Reset all values to this card's factory dump (serial is kept)?")) cardChanged(); }
+
+function saveClick() {
+  var errs = errorList();
+  if (errs.length) { alert("Please fix these fields first:\n\n" + errs.join("\n")); return; }
+  var text = generatePin(DB.cards[cur], vals), path = trim($("savepath").value), fso = getFSO();
+  if (fso) {
+    if (!path) { alert("Enter a file name to save to."); return; }
+    try {
+      if (fso.FileExists(path) && !confirm(path + " already exists. Overwrite?")) return;
+      var ts = fso.CreateTextFile(path, true, false);
+      ts.Write(text); ts.Close();
+      setStatus("Saved " + path);
+      alert("Saved " + path + "\n\nTo program the card (from plain DOS, in the MGA\\SETUP folder):\n\nPROGBIOS -i <biosfile>.bin -s " +
+            path.replace(/^.*[\\\/]/, "") + " -k");
+    } catch (e) { alert("Could not save file:\n" + path + "\n\n" + e.message); }
+    return;
+  }
+  try { /* browser fallback */
+    var name = path.replace(/^.*[\\\/]/, "") || "MYPINS.TXT";
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([text], { type: "text/plain" })); a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setStatus("Downloaded " + name);
+  } catch (e2) { alert("Saving is not supported here. Copy the text from the preview box instead."); }
+}
+
+window.onload = function () {
+  try { window.resizeTo(960, 800); } catch (e) {}
+  buildCardList();
+  cardChanged();
+};
+</script>
+</head>
+<body>
+<div id="bar">
+  <b>Card type:</b> <span id="cardslot"></span>
+  &nbsp; <button onclick="resetClick()">Reset to factory</button>
+  &nbsp; <label><input type="checkbox" id="expert" onclick="expertClick()"> Expert mode</label>
+</div>
+<div id="cardinfo"></div>
+<div id="main">
+  <h3>1. Your card</h3>
+  <div id="usergrid"></div>
+  <h3>2. Hardware parameters</h3>
+  <div class="hint" style="margin-bottom:4px">Drop-downs list the values used by real cards of this type. The card's own factory value is marked [factory].</div>
+  <div id="hwgrid"></div>
+  <div id="savebox">
+    <h3 style="margin-top:0">3. Save</h3>
+    Save to: <input class="path" id="savepath" type="text" value="C:\MYPINS.TXT">
+    <button onclick="saveClick()"><b>Generate &amp; Save</b></button>
+    <div class="hint" style="margin-top:6px">Then from plain DOS: <code>PROGBIOS -i &lt;biosfile&gt;.bin -s MYPINS.TXT -k</code></div>
+    <br><b>Preview</b> (exactly what will be saved)<br>
+    <textarea id="preview" readonly wrap="off"></textarea>
+  </div>
+</div>
+<div id="status">Ready</div>
+</body>
+</html>

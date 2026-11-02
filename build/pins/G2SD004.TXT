@@ -1,0 +1,43 @@
+DOS/4GW Protected Mode Run-time   Version 1.6
+Copyright (c) Rational Systems, Inc. 1990-1992
+MGA Bios Programming Utility v1.73d
+(C) Matrox Graphics Inc. (1997)
+
+Matrox MGA-G200 AGP
+VGA Enabled - BIOS V1.5 
+
+0: PIN 
+1: 64
+2: 255
+3: 3.0
+4: 1/11/1998
+5: 3
+6: 0000 0001 0000 0000
+7: ABT57874
+8: 004
+9: 834 0
+10: 130
+11: 130
+12: 130
+13: 103
+14: 52
+15: 255
+16: 255
+17: 62
+18: 62
+19: 62
+20: 62
+21: 62
+22: 04244ca1
+23: 16
+24: 238
+25: 4
+26: 128
+27: 136
+28: 0
+29: 8
+30: 255
+31: 84
+32: 67
+33: 255
+34: 35
